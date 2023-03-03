@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ai_note_taking/ai_note_taking.iml" filepath="$PROJECT_DIR$/ai_note_taking/ai_note_taking.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ai_note_taking/android/ai_note_taking_android.iml" filepath="$PROJECT_DIR$/ai_note_taking/android/ai_note_taking_android.iml" />
+    </modules>
+  </component>
+</project>

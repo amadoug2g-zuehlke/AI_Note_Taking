@@ -1,0 +1,23 @@
+<component name="libraryTable">
+  <library name="Flutter Plugins" type="FlutterPluginsLibraryType">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_windows-2.1.4" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_foundation-2.1.2" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_sound_web-9.2.13" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_sound-9.2.13" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_android-2.0.23" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider-2.0.13" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_linux-2.1.9" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/assets_audio_player-3.0.6" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/assets_audio_player_web-3.0.6" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/permission_handler-10.2.0" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/record_windows-0.7.1" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/record_macos-0.2.2" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/record_linux-0.4.1" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/record_web-0.5.0" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/record-4.4.4" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
