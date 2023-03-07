@@ -24,9 +24,7 @@ class NetworkHelper {
     print(responseBody);
 
     if (response.statusCode == 200) {
-      String result = await response.stream.bytesToString();
-
-      return TranscriptionResponse.fromJson(jsonDecode(result));
+      return TranscriptionResponse.fromJson(jsonDecode(responseBody));
     } else {
       print(response.statusCode);
     }
