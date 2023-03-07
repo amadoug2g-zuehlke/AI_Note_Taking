@@ -19,7 +19,7 @@ class RecordingScreen extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
@@ -31,26 +31,44 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  String _text = '';
-  late String _recordingPath;
-  bool isRecorderReady = false;
-  bool isFilePlaying = false;
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  //region Variables
   final audioPlayer = AudioPlayer();
   final recorder = FlutterSoundRecorder();
 
+  late String _recordingPath;
+  late AnimationController controller;
+
+  String _text = 'Transcription incoming...';
+  bool isLoading = false;
+  bool isRecorderReady = false;
+  bool isFilePlaying = false;
+  //endregion
+
+  //region Override Methods
   @override
   void initState() {
     super.initState();
     initRecorder();
+
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    )..addListener(() {
+        setState(() {});
+      });
+    controller.repeat();
   }
 
   @override
   void dispose() {
     recorder.closeRecorder();
+    controller.dispose();
     super.dispose();
   }
+  //endregion
 
+  //region Audio Recording
   void initRecorder() async {
     final status = await Permission.microphone.request();
 
@@ -66,14 +84,6 @@ class _HomePageState extends State<HomePage> {
     recorder.setSubscriptionDuration(
       const Duration(milliseconds: 500),
     );
-  }
-
-  Future<String> getFilePath(String audioFile) async {
-    Directory appDocumentsDirectory = await getApplicationDocumentsDirectory();
-    String appDocumentsPath = appDocumentsDirectory.path;
-    String filePath = '$appDocumentsPath/$audioFile';
-
-    return filePath;
   }
 
   void startRecording() async {
@@ -94,36 +104,46 @@ class _HomePageState extends State<HomePage> {
     print('Recording path: $_recordingPath');
   }
 
+  Future<String> getFilePath(String audioFile) async {
+    Directory appDocumentsDirectory = await getApplicationDocumentsDirectory();
+    String appDocumentsPath = appDocumentsDirectory.path;
+    String filePath = '$appDocumentsPath/$audioFile';
+
+    return filePath;
+  }
+  //endregion
+
+  //region File Transcription
   void pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'wav', 'webm'],
     );
     if (result != null) {
-      print('result is NOT NULL');
       File file = File(result.files.single.path!);
-      //audioPlayer.setReleaseMode(ReleaseMode.loop);
-      //audioPlayer.setSourceUrl(file.path);
+      audioPlayer.setSourceUrl(file.path);
 
       if (audioPlayer.source != null) {
-        print('Path is: ${file.path}');
         //playFile(audioPlayer.source);
         TranscriptionModel transcriptionModel = TranscriptionModel();
+        isLoading = true;
         var result = await transcriptionModel.getTranscription(file.path);
         displayTranscription(result.text);
       }
-    } else {
-      print('result is NULL');
     }
   }
 
+  //Displays file transcription
   void displayTranscription(String transcription) {
-    print('TRANSCRIPTION\n\n\n$transcription');
     setState(() {
       _text = transcription;
+      isLoading = false;
     });
   }
+  //endregion
 
+  //region Audio Player
+  /// Play selected file from local storage
   void playFile(source) {
     audioPlayer.play(source);
     Fluttertoast.showToast(
@@ -136,6 +156,7 @@ class _HomePageState extends State<HomePage> {
     isFilePlaying = true;
   }
 
+  /// Play file from assets folder
   void play() async {
     final player = AudioCache(prefix: 'assets/');
     final url = await player.load('audio_sample_002.mp3');
@@ -143,7 +164,8 @@ class _HomePageState extends State<HomePage> {
     isFilePlaying = true;
   }
 
-  void pauseFile() {
+  /// Pause stop file
+  void stopFile() {
     audioPlayer.stop();
     Fluttertoast.showToast(
         msg: "File stopped playing",
@@ -154,26 +176,33 @@ class _HomePageState extends State<HomePage> {
         fontSize: 16.0);
     isFilePlaying = false;
   }
+  //endregion
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Speech to Text App'),
+        title: const Text('Speech to Text App'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Expanded(
             child: Container(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               color: Colors.grey[200],
               child: SingleChildScrollView(
                 child: Text(
                   _text,
-                  style: TextStyle(fontSize: 20.0),
+                  style: const TextStyle(fontSize: 20.0),
                 ),
               ),
+            ),
+          ),
+          Visibility(
+            visible: isLoading ? true : false,
+            child: const LinearProgressIndicator(
+              minHeight: 5,
             ),
           ),
           Container(
@@ -186,11 +215,14 @@ class _HomePageState extends State<HomePage> {
                   glowColor: Colors.redAccent,
                   child: FloatingActionButton(
                     onPressed: () {
+                      print(_text);
+                      /*
                       if (recorder.isRecording) {
                         stopRecording();
                       } else {
                         startRecording();
                       }
+                      */
                     },
                     backgroundColor: Colors.red,
                     child: Icon(recorder.isRecording ? Icons.stop : Icons.mic),
@@ -208,13 +240,13 @@ class _HomePageState extends State<HomePage> {
                 */
                 ElevatedButton(
                   onPressed: () {
-                    pauseFile();
+                    stopFile();
                   },
                   style: ElevatedButton.styleFrom(
                     shape: const CircleBorder(),
                     padding: const EdgeInsets.all(10.0),
                     backgroundColor: Colors.blue,
-                    foregroundColor: isFilePlaying ? Colors.red : Colors.red,
+                    foregroundColor: isFilePlaying ? Colors.red : Colors.white,
                   ),
                   child: const Icon(Icons.stop_rounded),
                 ),
