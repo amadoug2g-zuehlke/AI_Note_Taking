@@ -1,13 +1,18 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:ai_note_taking/src/features/transcription/data/service/transcription.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:dart_now_time_filename/dart_now_time_filename.dart';
 import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:record/record.dart';
 
 class RecordingScreen extends StatelessWidget {
   const RecordingScreen({super.key});
@@ -35,14 +40,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   //region Variables
   final audioPlayer = AudioPlayer();
   final recorder = FlutterSoundRecorder();
+  FlutterSound flutterSound = FlutterSound();
+  final record = Record();
+  late List<SharedMediaFile>? _sharedFiles;
+  late StreamSubscription? _dataStreamSubscription;
 
   late String _recordingPath;
-  late AnimationController controller;
 
   String _text = 'Transcription incoming...';
   bool isLoading = false;
   bool isRecorderReady = false;
   bool isFilePlaying = false;
+
   //endregion
 
   //region Override Methods
@@ -51,21 +60,29 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.initState();
     initRecorder();
 
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-    )..addListener(() {
-        setState(() {});
+    _dataStreamSubscription = ReceiveSharingIntent.getMediaStream()
+        .listen((List<SharedMediaFile> files) {
+      setState(() {
+        _sharedFiles = files;
       });
-    controller.repeat();
+    });
+
+    ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> files) {
+      if (files != null) {
+        setState(() {
+          _sharedFiles = files;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     recorder.closeRecorder();
-    controller.dispose();
+    _dataStreamSubscription!.cancel();
     super.dispose();
   }
+
   //endregion
 
   //region Audio Recording
@@ -111,14 +128,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     return filePath;
   }
+
   //endregion
 
   //region File Transcription
   void pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'wav', 'webm'],
-    );
+        //type: FileType.custom,
+        //allowedExtensions: ['mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'wav', 'webm'],
+        );
     if (result != null) {
       File file = File(result.files.single.path!);
       audioPlayer.setSourceUrl(file.path);
@@ -140,6 +158,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       isLoading = false;
     });
   }
+
   //endregion
 
   //region Audio Player
@@ -176,6 +195,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         fontSize: 16.0);
     isFilePlaying = false;
   }
+
   //endregion
 
   @override
@@ -214,41 +234,35 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   endRadius: 50.0,
                   glowColor: Colors.redAccent,
                   child: FloatingActionButton(
-                    onPressed: () {
+                    onPressed: () async {
                       print(_text);
-                      /*
-                      if (recorder.isRecording) {
+                      if (await record.isRecording()) {
+                        //stopRecorder();
                         stopRecording();
                       } else {
+                        //startRecorder();
                         startRecording();
                       }
-                      */
                     },
                     backgroundColor: Colors.red,
                     child: Icon(recorder.isRecording ? Icons.stop : Icons.mic),
                   ),
                 ),
-                /*
-                GestureDetector(
-                    onTap: () {
-                      pauseFile();
+                Visibility(
+                  visible: false,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      stopFile();
                     },
-                    child: const Icon(
-                      Icons.stop_circle_rounded,
-                      size: 35,
-                    )),
-                */
-                ElevatedButton(
-                  onPressed: () {
-                    stopFile();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(10.0),
-                    backgroundColor: Colors.blue,
-                    foregroundColor: isFilePlaying ? Colors.red : Colors.white,
+                    style: ElevatedButton.styleFrom(
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(10.0),
+                      backgroundColor: Colors.blue,
+                      foregroundColor:
+                          isFilePlaying ? Colors.red : Colors.white,
+                    ),
+                    child: const Icon(Icons.stop_rounded),
                   ),
-                  child: const Icon(Icons.stop_rounded),
                 ),
                 StreamBuilder(
                   stream: recorder.onProgress,
