@@ -46,7 +46,6 @@ dependencies:
   avatar_glow: ^2.0.2
   audioplayers: ^3.0.1
   fluttertoast: ^8.2.1
-  dart_now_time_filename: ^2.0.2
   receive_sharing_intent: ^1.4.5
 
 dev_dependencies:
