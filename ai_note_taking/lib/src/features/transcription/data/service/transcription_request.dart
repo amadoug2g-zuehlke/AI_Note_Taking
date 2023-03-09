@@ -1,5 +1,5 @@
-import 'dart:convert';
 import 'package:ai_note_taking/src/features/transcription/data/service/networking.dart';
+import 'package:ai_note_taking/src/features/transcription/domain/model/response_format.dart';
 import 'package:ai_note_taking/src/features/transcription/domain/model/transcription_response.dart';
 import 'package:ai_note_taking/utils/credentials.dart';
 
@@ -12,8 +12,7 @@ class TranscriptionRequest {
   final String requestModel = 'whisper-1';
   final String requestFeature = 'audio/transcriptions';
 
-  final String requestPrompt =
-      'A conversation between 2 persons, leave a space everytime the speaker changes';
+  final String requestPrompt = '';
   final ResponseFormat requestResponseFormat = ResponseFormat.json;
   final int requestTemperature = 0;
   final String requestLanguage = '';
@@ -28,12 +27,6 @@ class TranscriptionRequest {
 
     return await networkHelper.getData(request);
   }
-}
 
-enum ResponseFormat {
-  json,
-  text,
-  srt,
-  verbose_json,
-  vtt,
+//TODO: Implement methods to change arguments for custom requests
 }

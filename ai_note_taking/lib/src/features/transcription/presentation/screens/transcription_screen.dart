@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'package:ai_note_taking/src/features/transcription/data/service/transcription_request.dart';
+import 'package:ai_note_taking/src/features/transcription/presentation/components/bottom_menu.dart';
+import 'package:ai_note_taking/src/features/transcription/presentation/components/loading_bar.dart';
+import 'package:ai_note_taking/src/features/transcription/presentation/components/transcription_box.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -21,7 +24,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   late String _selectedFileName = 'No file selected';
   late File _selectedFile;
 
-  String _text = 'Transcription incoming...';
+  String _text = 'Waiting for transcription...';
   bool isLoading = false;
   bool isFilePlaying = false;
   //endregion
@@ -211,24 +214,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              color: Colors.grey[200],
-              child: SingleChildScrollView(
-                child: Text(
-                  _text,
-                  style: const TextStyle(fontSize: 20.0),
-                ),
-              ),
-            ),
-          ),
-          Visibility(
-            visible: isLoading ? true : false,
-            child: const LinearProgressIndicator(
-              minHeight: 5,
-            ),
-          ),
+          TranscriptionBox(text: _text),
+          LoadingBar(isLoading: isLoading),
           Container(
             margin: const EdgeInsets.all(16.0),
             child: Row(

@@ -10,7 +10,10 @@ class TranslationScreen extends StatelessWidget {
         title: const Text('Translation'),
       ),
       body: const Center(
-        child: Text('Translation TBI'),
+        child: Text(
+          'TBD',
+          style: TextStyle(fontSize: 20),
+        ),
       ),
     );
   }
