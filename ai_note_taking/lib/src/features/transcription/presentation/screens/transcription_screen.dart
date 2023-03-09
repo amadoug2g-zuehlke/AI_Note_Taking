@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:ai_note_taking/src/features/transcription/data/service/transcription_request.dart';
-import 'package:ai_note_taking/src/features/transcription/presentation/components/bottom_menu.dart';
 import 'package:ai_note_taking/src/features/transcription/presentation/components/loading_bar.dart';
 import 'package:ai_note_taking/src/features/transcription/presentation/components/transcription_box.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -21,7 +20,7 @@ class TranscriptionScreen extends StatefulWidget {
 class _TranscriptionScreenState extends State<TranscriptionScreen> {
   //region Variables
   final audioPlayer = AudioPlayer();
-  late String _selectedFileName = 'No file selected';
+  late String _selectedFileName;
   late File _selectedFile;
 
   String _text = 'Waiting for transcription...';
@@ -34,9 +33,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   void initState() {
     super.initState();
 
-    setState(() {
-      _selectedFile = File('');
-    });
+    resetFile();
   }
   //endregion
 
@@ -55,9 +52,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
         });
       }
     } else {
-      setState(() {
-        _selectedFileName = 'No file selected';
-      });
+      resetFile();
     }
   }
 
@@ -131,6 +126,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     Widget continueButton = TextButton(
       child: const Text("OK"),
       onPressed: () {
+        resetFile();
         Navigator.of(context).pop();
       },
     );
@@ -170,6 +166,13 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
       _selectedFileName = fileName;
     });
   }
+
+  void resetFile() {
+    setState(() {
+      _selectedFile = File('');
+      _selectedFileName = 'No file selected';
+    });
+  }
   //endregion
 
   //region Audio Player
@@ -204,7 +207,6 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   }
   //endregion
 
-  //TODO: Split screen into components
   @override
   Widget build(BuildContext context) {
     return Scaffold(
