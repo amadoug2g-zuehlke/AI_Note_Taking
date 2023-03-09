@@ -1,10 +1,8 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:ai_note_taking/src/features/transcription/data/service/transcription_request.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_sound/flutter_sound.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
@@ -20,14 +18,9 @@ class TranscriptionScreen extends StatefulWidget {
 class _TranscriptionScreenState extends State<TranscriptionScreen> {
   //region Variables
   final audioPlayer = AudioPlayer();
-
-  List<SharedMediaFile>? _sharedFiles = null;
-  late StreamSubscription? _dataStreamSubscription;
   late String _selectedFileName = 'No file selected';
-  late String _sharedFilePath;
   late File _selectedFile;
 
-  FlutterSound flutterSound = FlutterSound();
   String _text = 'Transcription incoming...';
   bool isLoading = false;
   bool isFilePlaying = false;
@@ -38,35 +31,10 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   void initState() {
     super.initState();
 
-    _dataStreamSubscription = ReceiveSharingIntent.getMediaStream()
-        .listen((List<SharedMediaFile> files) {
-      setState(() {
-        _sharedFiles = files;
-      });
-    });
-
-    ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> files) {
-      if (files != null) {
-        setState(() {
-          _sharedFiles = files;
-          _sharedFilePath = files.first.path;
-          print('FIELS: $files');
-          print('FIELS 1: $_sharedFilePath');
-        });
-      }
-    });
-
     setState(() {
       _selectedFile = File('');
     });
   }
-
-  @override
-  void dispose() {
-    _dataStreamSubscription!.cancel();
-    super.dispose();
-  }
-
   //endregion
 
   //TODO: Add picker menu for format-supported files
@@ -95,7 +63,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     }
   }
 
-  //TODO: Split audio transcription in 2 - transcriptionFromLocalFile() & transcriptionFromSharedFile()
+  void transcriptionFromLocalFile() {}
+
   //TODO: Add transcription checks (file format, file size)
   ///Displays file transcription
   void transcriptionConfirmation() {
@@ -111,8 +80,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
         setState(() {
           isLoading = true;
         });
-        displayTranscription(
-            filePath: _selectedFile.path, path: _sharedFilePath);
+        displayTranscription(_selectedFile.path);
         Navigator.of(context).pop();
       },
     );
@@ -135,19 +103,16 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     );
   }
 
-  void displayTranscription({String? filePath, String? path}) async {
+  void displayTranscription(String filePath) async {
     TranscriptionRequest transcriptionModel =
-        TranscriptionRequest(requestFilePath: filePath ?? path!);
+        TranscriptionRequest(requestFilePath: filePath);
 
-    var result = (filePath!.length > path!.length)
-        ? await transcriptionModel.getTranscription(filePath)
-        : await transcriptionModel.getTranscription(path);
+    var result = await transcriptionModel.getTranscription(filePath);
 
     setState(() {
       _text = result.text;
       isLoading = false;
       _selectedFileName = 'No file selected';
-      _sharedFiles = null;
     });
   }
 
@@ -175,7 +140,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     });
   }
 
-  /// Pause stop file
+  /// Pause selected file
   void stopFile() {
     audioPlayer.stop();
     Fluttertoast.showToast(
@@ -189,7 +154,6 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
       isFilePlaying = false;
     });
   }
-
   //endregion
 
   //TODO: Split screen into components
@@ -197,7 +161,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Speech to Text App'),
+        title: const Text('Transcription'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -248,7 +212,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
                     shape: const CircleBorder(),
                     padding: const EdgeInsets.all(10.0),
                     backgroundColor:
-                        _sharedFiles == null ? Colors.grey : Colors.blue,
+                        _selectedFile.path.isEmpty ? Colors.grey : Colors.blue,
                     foregroundColor: Colors.white,
                   ),
                   child: const Icon(Icons.transcribe_rounded),
