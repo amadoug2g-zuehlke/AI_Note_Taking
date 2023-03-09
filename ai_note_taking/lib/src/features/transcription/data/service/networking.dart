@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:ai_note_taking/src/features/transcription/data/service/transcription_request.dart';
 import 'package:ai_note_taking/src/features/transcription/domain/model/transcription_response.dart';
-import 'package:ai_note_taking/utils/constants.dart';
+import 'package:ai_note_taking/utils/credentials.dart';
 import 'package:http/http.dart' as http;
 
 class NetworkHelper {

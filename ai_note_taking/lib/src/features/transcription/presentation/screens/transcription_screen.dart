@@ -4,7 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:path/path.dart' as p;
 
 //TODO: Add tests
 
@@ -37,14 +37,9 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   }
   //endregion
 
-  //TODO: Add picker menu for format-supported files
-  //TODO: Fix unsupported file formats
   //region File Transcription
   void pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.audio,
-      //allowedExtensions: ['mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'wav', 'webm'],
-    );
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
       File file = File(result.files.single.path!);
       audioPlayer.setSourceUrl(file.path);
@@ -63,11 +58,37 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     }
   }
 
-  void transcriptionFromLocalFile() {}
+  void transcriptionFromLocalFile() async {
+    if (await _selectedFile.length() > 25000000) {
+      Fluttertoast.showToast(
+          msg: "File size is over 25MB",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else {
+      switch (p.extension(_selectedFile.path)) {
+        case '.mp3':
+        case '.mp4':
+        case '.mpeg':
+        case '.mpga':
+        case '.m4a':
+        case '.wav':
+        case '.webm':
+          {
+            transcriptConfirmDialog();
+            break;
+          }
+        default:
+          {
+            formatErrorDialog();
+          }
+      }
+    }
+  }
 
-  //TODO: Add transcription checks (file format, file size)
-  ///Displays file transcription
-  void transcriptionConfirmation() {
+  void transcriptConfirmDialog() {
     Widget cancelButton = TextButton(
       child: const Text("Cancel"),
       onPressed: () {
@@ -91,6 +112,31 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
           Text("Would you like to transcribe this file? ($_selectedFileName)"),
       actions: [
         cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  void formatErrorDialog() {
+    Widget continueButton = TextButton(
+      child: const Text("OK"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: const Text("Transcription"),
+      content: const Text(
+          "File format is not supported (Compatible types: .mp3, .mp4, .mpeg, .mpga, .m4a, .wav, .webm)"),
+      actions: [
         continueButton,
       ],
     );
@@ -188,41 +234,59 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    pickFile();
-                  },
-                  icon: const Icon(Icons.folder),
-                  label: const Text('Select File'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      pickFile();
+                    },
+                    icon: const Icon(Icons.folder),
+                    label: const Text('Select File'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_selectedFile.path.isNotEmpty) {
-                      transcriptionConfirmation();
-                    } else {
-                      Fluttertoast.showToast(
-                          msg: "No file selected",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.CENTER,
-                          timeInSecForIosWeb: 1,
-                          textColor: Colors.white,
-                          fontSize: 16.0);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(10.0),
-                    backgroundColor:
-                        _selectedFile.path.isEmpty ? Colors.grey : Colors.blue,
-                    foregroundColor: Colors.white,
+                Expanded(
+                  flex: 1,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_selectedFile.path.isNotEmpty) {
+                        transcriptionFromLocalFile();
+                      } else {
+                        Fluttertoast.showToast(
+                            msg: "No file selected",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(10.0),
+                      backgroundColor: _selectedFile.path.isEmpty
+                          ? Colors.grey
+                          : Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Icon(Icons.transcribe_rounded),
                   ),
-                  child: const Icon(Icons.transcribe_rounded),
                 ),
-                Text(_selectedFileName),
+                Expanded(
+                  flex: 2,
+                  child: Center(
+                    child: Text(
+                      _selectedFileName,
+                      textAlign: TextAlign.justify,
+                      overflow: TextOverflow.fade,
+                      maxLines: 3,
+                      softWrap: true,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
