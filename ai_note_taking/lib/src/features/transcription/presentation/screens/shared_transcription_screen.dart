@@ -44,7 +44,10 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
 
   @override
   void dispose() {
-    _dataStreamSubscription!.cancel();
+    /// Nice! Very important to always close streams and or access
+    /// to file systems. Tho I'd always try to avoid the forced access with !
+    /// Try _dataStreamSubscription?.cancel();
+    _dataStreamSubscription?.cancel();
     super.dispose();
   }
   //endregion

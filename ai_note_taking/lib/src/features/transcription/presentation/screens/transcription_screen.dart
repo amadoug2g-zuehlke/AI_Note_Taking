@@ -10,6 +10,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path/path.dart' as p;
 
 //TODO: Add tests
+// Testing UI not always makes sense ;)
 
 class TranscriptionScreen extends StatefulWidget {
   const TranscriptionScreen({super.key});
@@ -41,6 +42,9 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   //endregion
 
   //region File Transcription
+
+  /// For such things it would make sense to add them to a viewModel à la MVVM style
+  /// https://medium.com/flutterworld/flutter-mvvm-architecture-f8bed2521958
   void pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
@@ -61,6 +65,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     }
   }
 
+  /// For such things it would make sense to add them to a viewModel à la MVVM style
+  /// https://medium.com/flutterworld/flutter-mvvm-architecture-f8bed2521958
   void transcriptionFromLocalFile() async {
     if (await _selectedFile.length() > 25000000) {
       Fluttertoast.showToast(
@@ -91,6 +97,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     }
   }
 
+  /// For such things it would make sense to add them to a viewModel à la MVVM style
+  /// https://medium.com/flutterworld/flutter-mvvm-architecture-f8bed2521958
   void transcriptConfirmDialog() {
     Widget cancelButton = TextButton(
       child: const Text("Cancel"),
@@ -127,6 +135,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     );
   }
 
+  /// For such things it would make sense to add them to a viewModel à la MVVM style
+  /// https://medium.com/flutterworld/flutter-mvvm-architecture-f8bed2521958
   void formatErrorDialog() {
     Widget continueButton = TextButton(
       child: const Text("OK"),
@@ -189,6 +199,9 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   }
 
   /// Pause selected file
+  ///
+  /// For such things it would make sense to add them to a viewModel à la MVVM style
+  /// https://medium.com/flutterworld/flutter-mvvm-architecture-f8bed2521958
   void stopFile() {
     audioPlayer.stop();
     Fluttertoast.showToast(

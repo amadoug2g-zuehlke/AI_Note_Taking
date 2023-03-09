@@ -25,8 +25,11 @@ class BottomMenu extends StatelessWidget {
           flex: 2,
           child: ElevatedButton.icon(
             onPressed: () async {
+              /// debugPrint to not reveal sensitive data in prod
               print('object');
               () => textButtonFunction;
+
+              /// debugPrint to not reveal sensitive data in prod
               print('object2');
             },
             icon: const Icon(Icons.folder),

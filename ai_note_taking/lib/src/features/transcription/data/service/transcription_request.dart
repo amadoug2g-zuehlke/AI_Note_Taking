@@ -25,6 +25,9 @@ class TranscriptionRequest {
     NetworkHelper networkHelper =
         NetworkHelper('$openAIBaseURL/$requestFeature');
 
+    /// This might throw as you defined your function with Future<TranscriptionResponse>
+    /// but .getData(...) has return type Future<dynamic>.
+
     return await networkHelper.getData(request);
   }
 

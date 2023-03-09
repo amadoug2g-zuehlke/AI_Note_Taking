@@ -8,6 +8,11 @@ class NetworkHelper {
 
   final String url;
 
+  /// Try to define the return type more precise.
+  /// Managing the possible returns separate each time generates a lot of redundant code.
+  /// By defining it e.g. Future<TranscriptionResponse?> you define it and only have
+  /// to verify your return when calling the function. You can also make this function
+  /// throwing and then use this possible throw (when failed) to display some onscreen dialog.
   Future getData(TranscriptionRequest transcriptionRequest) async {
     final Uri url = Uri.parse(this.url);
 
@@ -30,6 +35,7 @@ class NetworkHelper {
     if (response.statusCode == 200) {
       return TranscriptionResponse.fromJson(jsonDecode(responseBody));
     } else {
+      // I'd recommend debugPrint as this will also print in production
       print(response.statusCode);
     }
   }
