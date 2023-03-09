@@ -1,7 +1,43 @@
+import 'package:ai_note_taking/src/features/transcription/presentation/screens/transcription_screen.dart';
+import 'package:ai_note_taking/src/features/translation/presentation/screens/translation_screen.dart';
+import 'package:ai_note_taking/utils/constants.dart';
 import 'package:flutter/material.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  void showSupportedLanguages() {
+    Widget continueButton = TextButton(
+      child: const Text("OK"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: const Text(supportedLanguagesTitle),
+      content: const Text(
+        supportedLanguagesList,
+        textAlign: TextAlign.justify,
+        style: TextStyle(fontSize: 20),
+      ),
+      actions: [
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -9,26 +45,29 @@ class WelcomeScreen extends StatelessWidget {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: const [
+          children: [
             RoundedMenuIcon(
-                menuDestination: '/transcription',
-                menuButton: Icon(
+                menuDestination:
+                    TranscriptionScreen.navTranscriptionScreen.toString(),
+                menuButton: const Icon(
                   Icons.transcribe_rounded,
                   color: Colors.white,
                   size: 100,
                 ),
-                menuDescription:
-                    'Transcribe your audios into their original language'),
+                menuDescription: transcriptionMenuDescription),
             RoundedMenuIcon(
-              menuDestination: '/translation',
-              menuButton: Icon(
+              menuDestination:
+                  TranslationScreen.navTranslationScreen.toString(),
+              menuButton: const Icon(
                 Icons.translate_rounded,
                 color: Colors.white,
                 size: 100,
               ),
-              menuDescription:
-                  'Transcribe and translate your audios from their original language to english',
+              menuDescription: translationMenuDescription,
             ),
+            TextButton(
+                onPressed: () => showSupportedLanguages(),
+                child: const Text(supportedLanguagesTitle)),
           ],
         ),
       ),

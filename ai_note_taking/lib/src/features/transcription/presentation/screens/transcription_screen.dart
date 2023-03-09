@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:ai_note_taking/src/features/transcription/data/service/transcription_request.dart';
 import 'package:ai_note_taking/src/features/transcription/presentation/components/loading_bar.dart';
 import 'package:ai_note_taking/src/features/transcription/presentation/components/transcription_box.dart';
+import 'package:ai_note_taking/utils/constants.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -12,6 +13,8 @@ import 'package:path/path.dart' as p;
 
 class TranscriptionScreen extends StatefulWidget {
   const TranscriptionScreen({super.key});
+
+  static String navTranscriptionScreen = "/transcription";
 
   @override
   _TranscriptionScreenState createState() => _TranscriptionScreenState();
@@ -26,6 +29,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   String _text = 'Waiting for transcription...';
   bool isLoading = false;
   bool isFilePlaying = false;
+
   //endregion
 
   //region Override Methods
@@ -157,7 +161,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     setState(() {
       _text = result.text;
       isLoading = false;
-      _selectedFileName = 'No file selected';
+      _selectedFileName = noFileSelectedText;
     });
   }
 
@@ -170,9 +174,10 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   void resetFile() {
     setState(() {
       _selectedFile = File('');
-      _selectedFileName = 'No file selected';
+      _selectedFileName = noFileSelectedText;
     });
   }
+
   //endregion
 
   //region Audio Player
@@ -205,13 +210,14 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
       isFilePlaying = false;
     });
   }
+
   //endregion
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Transcription'),
+        title: const Text(transcriptionTitle),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -230,7 +236,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
                       pickFile();
                     },
                     icon: const Icon(Icons.folder),
-                    label: const Text('Select File'),
+                    label: const Text(fileToSelectText),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
@@ -245,7 +251,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
                         transcriptionFromLocalFile();
                       } else {
                         Fluttertoast.showToast(
-                            msg: "No file selected",
+                            msg: noFileSelectedText,
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.CENTER,
                             timeInSecForIosWeb: 1,

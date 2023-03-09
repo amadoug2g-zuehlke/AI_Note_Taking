@@ -10,6 +10,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 class TranslationScreen extends StatefulWidget {
   const TranslationScreen({Key? key}) : super(key: key);
 
+  static String navTranslationScreen = "/translation";
+
   @override
   State<TranslationScreen> createState() => _TranslationScreenState();
 }

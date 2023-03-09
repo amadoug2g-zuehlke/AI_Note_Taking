@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'package:ai_note_taking/src/features/transcription/data/service/transcription_request.dart';
+import 'package:ai_note_taking/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 class SharedTranscriptionScreen extends StatefulWidget {
   const SharedTranscriptionScreen({Key? key}) : super(key: key);
+
+  static String navSharedTranslationScreen = "/shared_transcription";
 
   @override
   State<SharedTranscriptionScreen> createState() =>
@@ -14,10 +17,10 @@ class SharedTranscriptionScreen extends StatefulWidget {
 class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
   //region Variables
   late StreamSubscription? _dataStreamSubscription;
-  late String _fileName = 'No file selected';
+  late String _fileName = noFileSelectedText;
 
   List<SharedMediaFile>? _sharedFiles;
-  String _text = 'Transcription incoming...';
+  String _text = 'Waiting for shared transcription...';
   bool isLoading = false;
   //endregion
 
@@ -76,6 +79,7 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
       _fileName = fileName;
     });
   }
+
   //endregion
 
   @override

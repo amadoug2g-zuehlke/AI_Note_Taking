@@ -11,9 +11,12 @@ void main() {
       initialRoute: '/',
       routes: {
         '/': (context) => const WelcomeScreen(),
-        '/transcription': (context) => const TranscriptionScreen(),
-        '/translation': (context) => const TranslationScreen(),
-        '/shared_transcription': (context) => const SharedTranscriptionScreen(),
+        TranscriptionScreen.navTranscriptionScreen: (context) =>
+            const TranscriptionScreen(),
+        TranslationScreen.navTranslationScreen: (context) =>
+            const TranslationScreen(),
+        SharedTranscriptionScreen.navSharedTranslationScreen: (context) =>
+            const SharedTranscriptionScreen(),
       },
     ),
   );
