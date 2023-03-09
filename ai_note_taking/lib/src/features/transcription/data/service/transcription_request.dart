@@ -1,0 +1,38 @@
+import 'dart:convert';
+import 'package:ai_note_taking/src/features/transcription/data/service/networking.dart';
+import 'package:ai_note_taking/src/features/transcription/domain/model/transcription_response.dart';
+import 'package:ai_note_taking/utils/constants.dart';
+
+class TranscriptionRequest {
+  final Map<String, String> requestHeader = {
+    'Authorization': 'Bearer $openAIBearerToken',
+    'Content-Type': 'multipart/form-data',
+  };
+  late final String requestFilePath;
+  final String requestModel = 'whisper-1';
+  final String requestFeature = 'audio/transcriptions';
+
+  final String requestPrompt = '';
+  final ResponseFormat requestResponseFormat = ResponseFormat.json;
+  final int requestTemperature = 0;
+  final String requestLanguage = '';
+
+  TranscriptionRequest({required this.requestFilePath});
+
+  Future<TranscriptionResponse> getTranscription(String filePath) async {
+    TranscriptionRequest request =
+        TranscriptionRequest(requestFilePath: filePath);
+    NetworkHelper networkHelper =
+        NetworkHelper('$openAIBaseURL/$requestFeature');
+
+    return await networkHelper.getData(request);
+  }
+}
+
+enum ResponseFormat {
+  json,
+  text,
+  srt,
+  verbose_json,
+  vtt,
+}

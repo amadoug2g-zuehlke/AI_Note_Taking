@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:ai_note_taking/src/features/transcription/data/service/transcription.dart';
+import 'package:ai_note_taking/src/features/transcription/data/service/transcription_request.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -136,7 +136,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   }
 
   void displayTranscription({String? filePath, String? path}) async {
-    TranscriptionModel transcriptionModel = TranscriptionModel();
+    TranscriptionRequest transcriptionModel =
+        TranscriptionRequest(requestFilePath: filePath ?? path!);
 
     var result = (filePath!.length > path!.length)
         ? await transcriptionModel.getTranscription(filePath)
@@ -235,36 +236,6 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
                     foregroundColor: Colors.white,
                   ),
                 ),
-                /*
-                ElevatedButton(
-                  onPressed: () {
-                    if (_sharedFiles != null) {
-                      if (isFilePlaying) {
-                        playFile(audioPlayer.source);
-                      } else {
-                        stopFile();
-                      }
-                    } else {
-                      Fluttertoast.showToast(
-                          msg: "No file currently selected",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.CENTER,
-                          timeInSecForIosWeb: 1,
-                          textColor: Colors.white,
-                          fontSize: 16.0);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(10.0),
-                    backgroundColor: isFilePlaying ? Colors.red : Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: Icon(isFilePlaying
-                      ? Icons.stop_rounded
-                      : Icons.play_arrow_rounded),
-                ),
-                */
                 ElevatedButton(
                   onPressed: () {
                     if (_selectedFile != null) {

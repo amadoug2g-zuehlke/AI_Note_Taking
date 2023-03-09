@@ -1,12 +1,18 @@
 import 'package:ai_note_taking/src/features/transcription/presentation/screens/transcription_screen.dart';
+import 'package:ai_note_taking/src/features/translation/presentation/screens/translation_screen.dart';
+import 'package:ai_note_taking/src/features/welcome/presentation/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 
-//TODO: Add routes
 void main() {
   runApp(
-    const MaterialApp(
-      title: 'Speech to Text App',
-      home: TranscriptionScreen(),
+    MaterialApp(
+      title: 'Speech to Text',
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const WelcomeScreen(),
+        '/transcription': (context) => const TranscriptionScreen(),
+        '/translation': (context) => const TranslationScreen(),
+      },
     ),
   );
 }
