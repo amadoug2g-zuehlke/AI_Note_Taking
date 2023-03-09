@@ -42,9 +42,9 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   //region File Transcription
   void pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-        //type: FileType.custom,
-        //allowedExtensions: ['mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'wav', 'webm'],
-        );
+      type: FileType.audio,
+      //allowedExtensions: ['mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'wav', 'webm'],
+    );
     if (result != null) {
       File file = File(result.files.single.path!);
       audioPlayer.setSourceUrl(file.path);
@@ -121,7 +121,6 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
       _selectedFileName = fileName;
     });
   }
-
   //endregion
 
   //region Audio Player
@@ -202,10 +201,16 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (_selectedFile != null) {
+                    if (_selectedFile.path.isNotEmpty) {
                       transcriptionConfirmation();
                     } else {
-                      null;
+                      Fluttertoast.showToast(
+                          msg: "No file selected",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          textColor: Colors.white,
+                          fontSize: 16.0);
                     }
                   },
                   style: ElevatedButton.styleFrom(
