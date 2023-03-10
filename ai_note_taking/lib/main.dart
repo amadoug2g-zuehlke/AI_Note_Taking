@@ -8,27 +8,14 @@ void main() {
   runApp(
     MaterialApp(
       title: 'Speech to Text',
-      initialRoute: '/',
+      initialRoute: WelcomeScreen.routeName,
       routes: {
-        '/': (context) => const WelcomeScreen(),
-        TranscriptionScreen.navTranscriptionScreen: (context) =>
-            const TranscriptionScreen(),
-        TranslationScreen.navTranslationScreen: (context) =>
-            const TranslationScreen(),
-        SharedTranscriptionScreen.navSharedTranslationScreen: (context) =>
+        WelcomeScreen.routeName: (context) => const WelcomeScreen(),
+        TranscriptionScreen.routeName: (context) => const TranscriptionScreen(),
+        TranslationScreen.routeName: (context) => const TranslationScreen(),
+        SharedTranscriptionScreen.routeName: (context) =>
             const SharedTranscriptionScreen(),
       },
     ),
   );
-}
-
-class StartScreen extends StatelessWidget {
-  const StartScreen({Key? key}) : super(key: key);
-
-  //TODO: Add check for sharing intent at startup, navigate to SharedTranscriptionScreen with data if available
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
 }

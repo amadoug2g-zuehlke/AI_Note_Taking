@@ -14,7 +14,7 @@ import 'package:path/path.dart' as p;
 class TranscriptionScreen extends StatefulWidget {
   const TranscriptionScreen({super.key});
 
-  static String navTranscriptionScreen = "/transcription";
+  static String routeName = "/transcription";
 
   @override
   _TranscriptionScreenState createState() => _TranscriptionScreenState();

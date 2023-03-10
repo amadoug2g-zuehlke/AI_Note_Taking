@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'package:ai_note_taking/src/features/transcription/data/service/transcription_request.dart';
+import 'package:ai_note_taking/src/features/transcription/domain/model/shared_screen_arguments.dart';
 import 'package:ai_note_taking/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 class SharedTranscriptionScreen extends StatefulWidget {
   const SharedTranscriptionScreen({Key? key}) : super(key: key);
-
-  static String navSharedTranslationScreen = "/shared_transcription";
+  static String routeName = "/shared_transcription";
 
   @override
   State<SharedTranscriptionScreen> createState() =>
@@ -18,8 +19,8 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
   //region Variables
   late StreamSubscription? _dataStreamSubscription;
   late String _fileName = noFileSelectedText;
+  late SharedScreenArguments args;
 
-  List<SharedMediaFile>? _sharedFiles;
   String _text = 'Waiting for shared transcription...';
   bool isLoading = false;
   //endregion
@@ -28,21 +29,6 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
   @override
   void initState() {
     super.initState();
-
-    _dataStreamSubscription = ReceiveSharingIntent.getMediaStream()
-        .listen((List<SharedMediaFile> files) {
-      setState(() {
-        _sharedFiles = files;
-      });
-    });
-
-    ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> files) {
-      if (files != null) {
-        setState(() {
-          _sharedFiles = files;
-        });
-      }
-    });
   }
 
   @override
@@ -54,7 +40,10 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
 
   //region File Transcription
   void transcriptionFromSharedFile() {
-    String filePath = _sharedFiles!.first.path;
+    setState(() {
+      isLoading = true;
+    });
+    String filePath = args.sharedFiles.first.path;
 
     displayTranscription(filePath);
     displaySelectedFile(filePath.substring(filePath.lastIndexOf('/') + 1));
@@ -70,7 +59,6 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
       _text = result.text;
       isLoading = false;
       _fileName = 'No file selected';
-      //_sharedFiles = null;
     });
   }
 
@@ -84,6 +72,9 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    args = ModalRoute.of(context)!.settings.arguments as SharedScreenArguments;
+    transcriptionFromSharedFile();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shared file transcription'),
@@ -110,13 +101,45 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
             ),
           ),
           Container(
+            height: 40,
             margin: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(_fileName),
-              ],
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                _fileName,
+                textAlign: TextAlign.justify,
+                overflow: TextOverflow.fade,
+                maxLines: 3,
+                softWrap: true,
+              ),
             ),
+            /*
+            ElevatedButton(
+                  onPressed: () {
+                    if (args.sharedFiles.first.path.isNotEmpty) {
+                      transcriptionFromSharedFile();
+                    } else {
+                      Fluttertoast.showToast(
+                        msg: noFileSelectedText,
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(10.0),
+                    backgroundColor: args.sharedFiles.first.path.isEmpty
+                        ? Colors.grey
+                        : Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Icon(Icons.transcribe_rounded),
+                ),
+             */
           ),
         ],
       ),
