@@ -30,3 +30,26 @@ class TranscriptionRequest {
 
 //TODO: Implement methods to change arguments for custom requests
 }
+
+enum TranscriptionPrompt {
+  //TODO: Add the right prompts
+  punctuation,
+  fillerWords;
+
+  String example() {
+    switch (this) {
+      case punctuation:
+        {
+          return 'Hello, welcome to my lecture.';
+        }
+      case fillerWords:
+        {
+          return 'Umm, let me think like, hmm... Okay, here\'s what I\'m, like, thinking.';
+        }
+      default:
+        {
+          return '';
+        }
+    }
+  }
+}

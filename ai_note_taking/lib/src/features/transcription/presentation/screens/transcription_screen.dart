@@ -90,6 +90,25 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     }
   }
 
+  Widget showSettings() {
+    return FloatingActionButton(
+      child: const Icon(Icons.add),
+      onPressed: () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (context) => SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: const Text('Select service'),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void transcriptConfirmDialog() {
     Widget cancelButton = TextButton(
       child: const Text("Cancel"),

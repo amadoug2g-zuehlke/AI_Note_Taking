@@ -1,24 +1,32 @@
 import 'dart:async';
+
 import 'package:ai_note_taking/src/features/transcription/domain/model/shared_screen_arguments.dart';
 import 'package:ai_note_taking/src/features/transcription/presentation/screens/shared_transcription_screen.dart';
 import 'package:ai_note_taking/src/features/transcription/presentation/screens/transcription_screen.dart';
 import 'package:ai_note_taking/src/features/translation/presentation/screens/translation_screen.dart';
-import 'package:ai_note_taking/src/features/welcome/presentation/components/round_menu_icon.dart';
+import 'package:ai_note_taking/src/features/welcome/presentation/components/action_button.dart';
+import 'package:ai_note_taking/src/features/welcome/presentation/components/expandable_fab.dart';
 import 'package:ai_note_taking/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
-class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+//TODO: Redesign welcome_screen as home_screen
+//TODO: Create audio notes list
+//TODO: Create Expandable FAB menu for transcriptions & translations
+//TODO: Save audio transcriptions as a list of LocalTranscript
+//TODO: Add menu for shared file (Transcriptions or Translations)
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
   static String routeName = "/";
 
   @override
-  State<WelcomeScreen> createState() => _WelcomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   //region Variables
   late StreamSubscription? _dataStreamSubscription;
   List<SharedMediaFile>? _sharedFiles = [];
@@ -53,7 +61,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   //endregion
 
   //region Navigation
-  void chooseNavigation(List<SharedMediaFile>? files) {
+  void navigateToTranslate(BuildContext context) {
+    Navigator.pushNamed(context, TranslationScreen.routeName.toString());
+  }
+
+  void navigateToTranscription(BuildContext context) {
+    Navigator.pushNamed(context, TranscriptionScreen.routeName.toString());
+  }
+
+  void navigateToSharedTranscription(BuildContext context) {
     if (_sharedFiles?.length != 0) {
       Navigator.pushNamed(
         context,
@@ -104,40 +120,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            RoundedMenuIcon(
-                menuDestination: TranscriptionScreen.routeName.toString(),
-                menuButton: const Icon(
-                  Icons.transcribe_rounded,
-                  color: Colors.white,
-                  size: 100,
-                ),
-                menuDescription: transcriptionMenuDescription),
-            RoundedMenuIcon(
-              menuDestination: TranslationScreen.routeName.toString(),
-              menuButton: const Icon(
-                Icons.translate_rounded,
-                color: Colors.white,
-                size: 100,
-              ),
-              menuDescription: translationMenuDescription,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TextButton(
-                    onPressed: () => showSupportedLanguages(),
-                    child: const Text(supportedLanguagesTitle)),
-                TextButton(
-                    onPressed: () => chooseNavigation(_sharedFiles),
-                    child: const Text(sharedFileTranslationTitle)),
-              ],
-            ),
-          ],
-        ),
+      body: const Center(
+        child: Text('Audio list to be implemented!'),
+      ),
+      floatingActionButton: ExpandableFab(
+        distance: 112.0,
+        children: [
+          ActionButton(
+            onPressed: () => navigateToSharedTranscription(context),
+            icon: const Icon(Icons.share_rounded),
+          ),
+          ActionButton(
+            onPressed: () => navigateToTranscription(context),
+            icon: const Icon(Icons.translate_rounded),
+          ),
+          ActionButton(
+            onPressed: () => navigateToTranscription(context),
+            icon: const Icon(Icons.transcribe_rounded),
+          ),
+        ],
       ),
     );
   }
