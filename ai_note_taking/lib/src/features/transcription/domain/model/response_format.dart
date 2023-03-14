@@ -2,6 +2,6 @@ enum ResponseFormat {
   json,
   text,
   srt,
-  verbose_json,
+  verboseJson,
   vtt,
 }

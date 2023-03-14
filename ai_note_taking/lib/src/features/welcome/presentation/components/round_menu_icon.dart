@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class RoundedMenuIcon extends StatelessWidget {
   const RoundedMenuIcon({
-    super.key,
     required this.menuDestination,
     required this.menuButton,
     required this.menuDescription,
+    super.key,
   });
 
   final Icon menuButton;
@@ -26,7 +26,7 @@ class RoundedMenuIcon extends StatelessWidget {
             style: ButtonStyle(
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100.0),
+                  borderRadius: BorderRadius.circular(100),
                 ),
               ),
             ),

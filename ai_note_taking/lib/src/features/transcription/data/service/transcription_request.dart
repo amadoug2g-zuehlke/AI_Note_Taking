@@ -4,25 +4,25 @@ import 'package:ai_note_taking/src/features/transcription/domain/model/transcrip
 import 'package:ai_note_taking/utils/credentials.dart';
 
 class TranscriptionRequest {
+  TranscriptionRequest({required this.requestFilePath});
+
+  final String requestFeature = 'audio/transcriptions';
+  late final String requestFilePath;
   final Map<String, String> requestHeader = {
     'Authorization': 'Bearer $openAIBearerToken',
     'Content-Type': 'multipart/form-data',
   };
-  late final String requestFilePath;
-  final String requestModel = 'whisper-1';
-  final String requestFeature = 'audio/transcriptions';
 
+  final String requestLanguage = '';
+  final String requestModel = 'whisper-1';
   final String requestPrompt = '';
   final ResponseFormat requestResponseFormat = ResponseFormat.json;
   final int requestTemperature = 0;
-  final String requestLanguage = '';
-
-  TranscriptionRequest({required this.requestFilePath});
 
   Future<TranscriptionResponse> getTranscription(String filePath) async {
-    TranscriptionRequest request =
+    final TranscriptionRequest request =
         TranscriptionRequest(requestFilePath: filePath);
-    NetworkHelper networkHelper =
+    final NetworkHelper networkHelper =
         NetworkHelper('$openAIBaseURL/$requestFeature');
 
     return await networkHelper.getTranscriptionData(request);
@@ -44,7 +44,7 @@ enum TranscriptionPrompt {
         }
       case fillerWords:
         {
-          return 'Umm, let me think like, hmm... Okay, here\'s what I\'m, like, thinking.';
+          return "Umm, let me think like, hmm... Okay, here's what I'm, like, thinking.";
         }
       default:
         {

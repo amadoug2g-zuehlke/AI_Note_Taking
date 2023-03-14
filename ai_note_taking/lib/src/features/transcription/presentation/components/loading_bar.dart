@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class LoadingBar extends StatelessWidget {
   const LoadingBar({
-    super.key,
     required this.isLoading,
+    super.key,
   });
 
   final bool isLoading;

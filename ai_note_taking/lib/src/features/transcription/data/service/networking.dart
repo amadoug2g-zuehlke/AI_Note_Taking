@@ -10,29 +10,18 @@ class NetworkHelper {
 
   final String url;
 
-  /*
-  Future getData(
-      {TranscriptionRequest? transcriptionRequest,
-      TranslationRequest? translationRequest}) async {
-    final Uri url = Uri.parse(this.url);
-
-    if (transcriptionRequest != null) {
-      getTranscriptionData(transcriptionRequest, url);
-    } else if (translationRequest != null) {
-      getTranslationData(translationRequest, url);
-    } else {
-      return throw Exception('Unknown request format');
-    }
-  }
-  */
-
   Future<TranscriptionResponse> getTranscriptionData(
-      TranscriptionRequest transcriptionRequest) async {
+    TranscriptionRequest transcriptionRequest,
+  ) async {
     final Uri url = Uri.parse(this.url);
 
     final request = http.MultipartRequest('POST', url)
-      ..files.add(await http.MultipartFile.fromPath(
-          'file', transcriptionRequest.requestFilePath))
+      ..files.add(
+        await http.MultipartFile.fromPath(
+          'file',
+          transcriptionRequest.requestFilePath,
+        ),
+      )
       ..fields['model'] = transcriptionRequest.requestModel
       ..fields['prompt'] = transcriptionRequest.requestPrompt
       ..fields['response_format'] =
@@ -49,23 +38,31 @@ class NetworkHelper {
     switch (response.statusCode) {
       case 200:
         {
-          return TranscriptionResponse.fromJson(jsonDecode(responseBody));
+          return TranscriptionResponse.fromJson(
+            jsonDecode(responseBody) as Map<String, dynamic>,
+          );
         }
       default:
         {
           return throw Exception(
-              'An error occurred: ${response.reasonPhrase} [${response.statusCode}]');
+            'An error occurred: ${response.reasonPhrase} [${response.statusCode}]',
+          );
         }
     }
   }
 
   Future<TranslationResponse> getTranslationData(
-      TranslationRequest translationRequest) async {
+    TranslationRequest translationRequest,
+  ) async {
     final Uri url = Uri.parse(this.url);
 
     final request = http.MultipartRequest('POST', url)
-      ..files.add(await http.MultipartFile.fromPath(
-          'file', translationRequest.requestFilePath))
+      ..files.add(
+        await http.MultipartFile.fromPath(
+          'file',
+          translationRequest.requestFilePath,
+        ),
+      )
       ..fields['model'] = translationRequest.requestModel
       ..fields['prompt'] = translationRequest.requestPrompt
       ..fields['response_format'] =
@@ -81,12 +78,15 @@ class NetworkHelper {
     switch (response.statusCode) {
       case 200:
         {
-          return TranslationResponse.fromJson(jsonDecode(responseBody));
+          return TranslationResponse.fromJson(
+            jsonDecode(responseBody) as Map<String, dynamic>,
+          );
         }
       default:
         {
           return throw Exception(
-              'An error occurred: ${response.reasonPhrase} [${response.statusCode}]');
+            'An error occurred: ${response.reasonPhrase} [${response.statusCode}]',
+          );
         }
     }
   }

@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 @immutable
 class ExpandingActionButton extends StatelessWidget {
   const ExpandingActionButton({
-    super.key,
     required this.directionInDegrees,
     required this.maxDistance,
     required this.progress,
     required this.child,
+    super.key,
   });
 
   final double directionInDegrees;
@@ -30,7 +30,7 @@ class ExpandingActionButton extends StatelessWidget {
           bottom: 4.0 + offset.dy,
           child: Transform.rotate(
             angle: (1.0 - progress.value) * pi / 2,
-            child: child!,
+            child: child,
           ),
         );
       },

@@ -28,25 +28,26 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  flutter:
-    sdk: flutter
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  flutter_sound: ^9.2.13
   assets_audio_player: ^3.0.6
-  permission_handler: ^10.2.0
-  record: ^4.4.4
-  intl: ^0.18.0
-  file_picker: ^5.2.5
-  path_provider: ^2.0.13
-  path: ^1.8.2
-  avatar_glow: ^2.0.2
   audioplayers: ^3.0.1
+  avatar_glow: ^2.0.2
+  cupertino_icons: ^1.0.2
+  file_picker: ^5.2.5
+  flutter:
+    sdk: flutter
+  flutter_sound: ^9.2.13
   fluttertoast: ^8.2.1
+  http: ^0.13.5
+  intl: ^0.18.0
+  path: ^1.8.2
+  path_provider: ^2.0.13
+  permission_handler: ^10.2.0
   receive_sharing_intent: ^1.4.5
+  record: ^4.4.4
 
 dev_dependencies:
   flutter_test:
@@ -57,7 +58,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  very_good_analysis: ^4.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

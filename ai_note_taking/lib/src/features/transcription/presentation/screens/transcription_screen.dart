@@ -1,34 +1,35 @@
 import 'dart:io';
 import 'package:ai_note_taking/src/features/transcription/data/service/transcription_request.dart';
+import 'package:ai_note_taking/src/features/transcription/domain/model/transcription_response.dart';
 import 'package:ai_note_taking/src/features/transcription/presentation/components/loading_bar.dart';
 import 'package:ai_note_taking/src/features/transcription/presentation/components/transcription_box.dart';
 import 'package:ai_note_taking/utils/constants.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path/path.dart' as p;
-
-//TODO: Add tests
 
 class TranscriptionScreen extends StatefulWidget {
   const TranscriptionScreen({super.key});
 
   static String routeName = "/transcription";
 
+  // Note: Since createState is publicly callable, make the class also public.
   @override
-  _TranscriptionScreenState createState() => _TranscriptionScreenState();
+  TranscriptionScreenState createState() => TranscriptionScreenState();
 }
 
-class _TranscriptionScreenState extends State<TranscriptionScreen> {
+class TranscriptionScreenState extends State<TranscriptionScreen> {
   //region Variables
   final audioPlayer = AudioPlayer();
-  late String _selectedFileName;
-  late File _selectedFile;
 
-  String _text = 'Waiting for transcription...';
-  bool isLoading = false;
   bool isFilePlaying = false;
+  bool isLoading = false;
+
+  late File _selectedFile;
+  late String _selectedFileName;
+  String _text = 'Waiting for transcription...';
 
   //endregion
 
@@ -39,18 +40,21 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
 
     resetFile();
   }
+
   //endregion
 
   //region File Transcription
-  void pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+  Future<void> pickFile() async {
+    final FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
-      File file = File(result.files.single.path!);
-      audioPlayer.setSourceUrl(file.path);
+      final File file = File(result.files.single.path!);
+      // Must be awaited!
+      await audioPlayer.setSourceUrl(file.path);
 
       if (audioPlayer.source != null) {
         displaySelectedFile(
-            file.path.substring(file.path.lastIndexOf('/') + 1));
+          file.path.substring(file.path.lastIndexOf('/') + 1),
+        );
         setState(() {
           _selectedFile = file;
         });
@@ -60,15 +64,16 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     }
   }
 
-  void transcriptionFromLocalFile() async {
+  Future<void> transcriptionFromLocalFile() async {
     if (await _selectedFile.length() > 25000000) {
-      Fluttertoast.showToast(
-          msg: "File size is over 25MB",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      await Fluttertoast.showToast(
+        msg: "File size is over 25MB",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        textColor: Colors.white,
+        fontSize: 16,
+      );
     } else {
       switch (p.extension(_selectedFile.path)) {
         case '.mp3':
@@ -79,12 +84,12 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
         case '.wav':
         case '.webm':
           {
-            transcriptConfirmDialog();
+            await transcriptConfirmDialog<dynamic>();
             break;
           }
         default:
           {
-            formatErrorDialog();
+            await formatErrorDialog<dynamic>();
           }
       }
     }
@@ -93,14 +98,15 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   Widget showSettings() {
     return FloatingActionButton(
       child: const Icon(Icons.add),
-      onPressed: () {
-        showModalBottomSheet(
+      onPressed: () async {
+        await showModalBottomSheet<dynamic>(
           context: context,
           isScrollControlled: true,
           builder: (context) => SingleChildScrollView(
             child: Container(
               padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom),
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
               child: const Text('Select service'),
             ),
           ),
@@ -109,14 +115,14 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     );
   }
 
-  void transcriptConfirmDialog() {
-    Widget cancelButton = TextButton(
+  Future<T?> transcriptConfirmDialog<T>() async {
+    final Widget cancelButton = TextButton(
       child: const Text("Cancel"),
       onPressed: () {
         Navigator.of(context).pop();
       },
     );
-    Widget continueButton = TextButton(
+    final Widget continueButton = TextButton(
       child: const Text("Transcribe"),
       onPressed: () {
         setState(() {
@@ -127,7 +133,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
       },
     );
 
-    AlertDialog alert = AlertDialog(
+    final AlertDialog alert = AlertDialog(
       title: const Text("Transcription"),
       content:
           Text("Would you like to transcribe this file? ($_selectedFileName)"),
@@ -137,7 +143,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
       ],
     );
 
-    showDialog(
+    return await showDialog<T>(
       context: context,
       builder: (BuildContext context) {
         return alert;
@@ -145,8 +151,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     );
   }
 
-  void formatErrorDialog() {
-    Widget continueButton = TextButton(
+  Future<T?> formatErrorDialog<T>() async {
+    final Widget continueButton = TextButton(
       child: const Text("OK"),
       onPressed: () {
         resetFile();
@@ -154,16 +160,17 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
       },
     );
 
-    AlertDialog alert = AlertDialog(
+    final AlertDialog alert = AlertDialog(
       title: const Text("Transcription"),
       content: const Text(
-          "File format is not supported (Compatible types: .mp3, .mp4, .mpeg, .mpga, .m4a, .wav, .webm)"),
+        "File format is not supported (Compatible types: .mp3, .mp4, .mpeg, .mpga, .m4a, .wav, .webm)",
+      ),
       actions: [
         continueButton,
       ],
     );
 
-    showDialog(
+    return await showDialog(
       context: context,
       builder: (BuildContext context) {
         return alert;
@@ -171,11 +178,12 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     );
   }
 
-  void displayTranscription(String filePath) async {
-    TranscriptionRequest transcriptionModel =
+  Future<void> displayTranscription(String filePath) async {
+    final TranscriptionRequest transcriptionModel =
         TranscriptionRequest(requestFilePath: filePath);
 
-    var result = await transcriptionModel.getTranscription(filePath);
+    final TranscriptionResponse result =
+        await transcriptionModel.getTranscription(filePath);
 
     setState(() {
       _text = result.text;
@@ -184,7 +192,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
     });
   }
 
-  void displaySelectedFile(fileName) {
+  void displaySelectedFile(String fileName) {
     setState(() {
       _selectedFileName = fileName;
     });
@@ -201,15 +209,16 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
 
   //region Audio Player
   /// Play selected file from local storage
-  void playFile(source) {
+  void playFile(Source source) {
     audioPlayer.play(source);
     Fluttertoast.showToast(
-        msg: "File is playing",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        textColor: Colors.white,
-        fontSize: 16.0);
+      msg: "File is playing",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      textColor: Colors.white,
+      fontSize: 16,
+    );
     setState(() {
       isFilePlaying = true;
     });
@@ -219,12 +228,13 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
   void stopFile() {
     audioPlayer.stop();
     Fluttertoast.showToast(
-        msg: "File stopped playing",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        textColor: Colors.white,
-        fontSize: 16.0);
+      msg: "File stopped playing",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      textColor: Colors.white,
+      fontSize: 16,
+    );
     setState(() {
       isFilePlaying = false;
     });
@@ -244,7 +254,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
           TranscriptionBox(text: _text),
           LoadingBar(isLoading: isLoading),
           Container(
-            margin: const EdgeInsets.all(16.0),
+            margin: const EdgeInsets.all(16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -252,7 +262,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
                   flex: 2,
                   child: ElevatedButton.icon(
                     onPressed: () async {
-                      pickFile();
+                      await pickFile();
                     },
                     icon: const Icon(Icons.folder),
                     label: const Text(fileToSelectText),
@@ -270,17 +280,18 @@ class _TranscriptionScreenState extends State<TranscriptionScreen> {
                         transcriptionFromLocalFile();
                       } else {
                         Fluttertoast.showToast(
-                            msg: noFileSelectedText,
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
+                          msg: noFileSelectedText,
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          textColor: Colors.white,
+                          fontSize: 16,
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
                       shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(10),
                       backgroundColor: _selectedFile.path.isEmpty
                           ? Colors.grey
                           : Colors.blue,

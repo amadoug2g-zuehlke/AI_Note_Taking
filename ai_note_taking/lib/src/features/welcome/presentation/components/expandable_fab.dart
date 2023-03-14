@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 
 class ExpandableFab extends StatefulWidget {
   const ExpandableFab({
-    Key? key,
-    this.initialOpen,
     required this.distance,
     required this.children,
-  }) : super(key: key);
+    super.key,
+    this.initialOpen,
+  });
 
   final bool? initialOpen;
   final double distance;
@@ -77,17 +77,17 @@ class _ExpandableFabState extends State<ExpandableFab>
 
   Widget _buildTapToCloseFab() {
     return SizedBox(
-      width: 56.0,
-      height: 56.0,
+      width: 56,
+      height: 56,
       child: Center(
         child: Material(
           shape: const CircleBorder(),
           clipBehavior: Clip.antiAlias,
-          elevation: 4.0,
+          elevation: 4,
           child: InkWell(
             onTap: _toggle,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8),
               child: Icon(
                 Icons.close,
                 color: Theme.of(context).primaryColor,
@@ -107,13 +107,13 @@ class _ExpandableFabState extends State<ExpandableFab>
         transform: Matrix4.diagonal3Values(
           _open ? 0.7 : 1.0,
           _open ? 0.7 : 1.0,
-          1.0,
+          1,
         ),
         duration: const Duration(milliseconds: 250),
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+        curve: const Interval(0, 0.5, curve: Curves.easeOut),
         child: AnimatedOpacity(
           opacity: _open ? 0.0 : 1.0,
-          curve: const Interval(0.25, 1.0, curve: Curves.easeInOut),
+          curve: const Interval(0.25, 1, curve: Curves.easeInOut),
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
             onPressed: _toggle,
