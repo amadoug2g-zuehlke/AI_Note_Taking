@@ -1,14 +1,16 @@
 import 'dart:io';
+
 import 'package:ai_note_taking/src/features/transcription/presentation/components/loading_bar.dart';
 import 'package:ai_note_taking/src/features/transcription/presentation/components/transcription_box.dart';
-import 'package:path/path.dart' as p;
 import 'package:ai_note_taking/src/features/translation/data/service/translation_request.dart';
+import 'package:ai_note_taking/src/features/translation/domain/model/translation_response.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:path/path.dart' as p;
 
 class TranslationScreen extends StatefulWidget {
-  const TranslationScreen({Key? key}) : super(key: key);
+  const TranslationScreen({super.key});
 
   static String routeName = "/translation";
 
@@ -17,13 +19,15 @@ class TranslationScreen extends StatefulWidget {
 }
 
 class _TranslationScreenState extends State<TranslationScreen> {
+  bool isFilePlaying = false;
+  bool isLoading = false;
+
+  late File _selectedFile;
   //region Variables
   late String _selectedFileName;
-  late File _selectedFile;
 
   String _text = 'Waiting for file to translate...';
-  bool isLoading = false;
-  bool isFilePlaying = false;
+
   //endregion
 
   //region Override Methods
@@ -33,13 +37,14 @@ class _TranslationScreenState extends State<TranslationScreen> {
 
     resetFile();
   }
+
   //endregion
 
   //region File Transcription
-  void pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+  Future<void> pickFile() async {
+    final FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
-      File file = File(result.files.single.path!);
+      final File file = File(result.files.single.path!);
 
       displaySelectedFile(file.path.substring(file.path.lastIndexOf('/') + 1));
       setState(() {
@@ -50,15 +55,16 @@ class _TranslationScreenState extends State<TranslationScreen> {
     }
   }
 
-  void transcriptionFromLocalFile() async {
+  Future<void> transcriptionFromLocalFile() async {
     if (await _selectedFile.length() > 25000000) {
-      Fluttertoast.showToast(
-          msg: "File size is over 25MB",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      await Fluttertoast.showToast(
+        msg: "File size is over 25MB",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        textColor: Colors.white,
+        fontSize: 16,
+      );
     } else {
       switch (p.extension(_selectedFile.path)) {
         case '.mp3':
@@ -69,25 +75,24 @@ class _TranslationScreenState extends State<TranslationScreen> {
         case '.wav':
         case '.webm':
           {
-            transcriptConfirmDialog();
-            break;
+            return await transcriptConfirmDialog();
           }
         default:
           {
-            formatErrorDialog();
+            return await formatErrorDialog();
           }
       }
     }
   }
 
-  void transcriptConfirmDialog() {
-    Widget cancelButton = TextButton(
+  Future<T?> transcriptConfirmDialog<T>() async {
+    final Widget cancelButton = TextButton(
       child: const Text("Cancel"),
       onPressed: () {
         Navigator.of(context).pop();
       },
     );
-    Widget continueButton = TextButton(
+    final Widget continueButton = TextButton(
       child: const Text("Transcribe"),
       onPressed: () {
         setState(() {
@@ -98,17 +103,18 @@ class _TranslationScreenState extends State<TranslationScreen> {
       },
     );
 
-    AlertDialog alert = AlertDialog(
+    final AlertDialog alert = AlertDialog(
       title: const Text("Transcription & translation"),
       content: Text(
-          "Would you like to transcribe and translate this file to english? ($_selectedFileName)"),
+        "Would you like to transcribe and translate this file to english? ($_selectedFileName)",
+      ),
       actions: [
         cancelButton,
         continueButton,
       ],
     );
 
-    showDialog(
+    return await showDialog<T>(
       context: context,
       builder: (BuildContext context) {
         return alert;
@@ -116,8 +122,8 @@ class _TranslationScreenState extends State<TranslationScreen> {
     );
   }
 
-  void formatErrorDialog() {
-    Widget continueButton = TextButton(
+  Future<T?> formatErrorDialog<T>() async {
+    final Widget continueButton = TextButton(
       child: const Text("OK"),
       onPressed: () {
         resetFile();
@@ -125,16 +131,17 @@ class _TranslationScreenState extends State<TranslationScreen> {
       },
     );
 
-    AlertDialog alert = AlertDialog(
+    final AlertDialog alert = AlertDialog(
       title: const Text("Transcription"),
       content: const Text(
-          "File format is not supported (Compatible types: .mp3, .mp4, .mpeg, .mpga, .m4a, .wav, .webm)"),
+        "File format is not supported (Compatible types: .mp3, .mp4, .mpeg, .mpga, .m4a, .wav, .webm)",
+      ),
       actions: [
         continueButton,
       ],
     );
 
-    showDialog(
+    return await showDialog<T>(
       context: context,
       builder: (BuildContext context) {
         return alert;
@@ -142,11 +149,12 @@ class _TranslationScreenState extends State<TranslationScreen> {
     );
   }
 
-  void displayTranscription(String filePath) async {
-    TranslationRequest transcriptionModel =
+  Future<void> displayTranscription(String filePath) async {
+    final TranslationRequest transcriptionModel =
         TranslationRequest(requestFilePath: filePath);
 
-    var result = await transcriptionModel.getTranslation(filePath);
+    final TranslationResponse result =
+        await transcriptionModel.getTranslation(filePath);
 
     setState(() {
       _text = result.text;
@@ -155,7 +163,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
     });
   }
 
-  void displaySelectedFile(fileName) {
+  void displaySelectedFile(String fileName) {
     setState(() {
       _selectedFileName = fileName;
     });
@@ -167,6 +175,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
       _selectedFileName = 'No file selected';
     });
   }
+
   //endregion
 
   @override
@@ -181,7 +190,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
           TranscriptionBox(text: _text),
           LoadingBar(isLoading: isLoading),
           Container(
-            margin: const EdgeInsets.all(16.0),
+            margin: const EdgeInsets.all(16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -189,7 +198,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
                   flex: 2,
                   child: ElevatedButton.icon(
                     onPressed: () async {
-                      pickFile();
+                      await pickFile();
                     },
                     icon: const Icon(Icons.folder),
                     label: const Text('Select File'),
@@ -207,17 +216,18 @@ class _TranslationScreenState extends State<TranslationScreen> {
                         transcriptionFromLocalFile();
                       } else {
                         Fluttertoast.showToast(
-                            msg: "No file selected",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
+                          msg: "No file selected",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          textColor: Colors.white,
+                          fontSize: 16,
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
                       shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(10),
                       backgroundColor: _selectedFile.path.isEmpty
                           ? Colors.grey
                           : Colors.blue,

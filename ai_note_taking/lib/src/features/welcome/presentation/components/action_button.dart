@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class ActionButton extends StatelessWidget {
   const ActionButton({
-    super.key,
     required this.icon,
+    super.key,
     this.onPressed,
   });
 
@@ -17,7 +17,7 @@ class ActionButton extends StatelessWidget {
       shape: const CircleBorder(),
       clipBehavior: Clip.antiAlias,
       color: theme.colorScheme.secondary,
-      elevation: 4.0,
+      elevation: 4,
       child: IconButton(
         onPressed: onPressed,
         icon: icon,

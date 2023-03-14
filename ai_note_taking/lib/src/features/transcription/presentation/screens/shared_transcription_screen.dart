@@ -3,11 +3,10 @@ import 'package:ai_note_taking/src/features/transcription/data/service/transcrip
 import 'package:ai_note_taking/src/features/transcription/domain/model/shared_screen_arguments.dart';
 import 'package:ai_note_taking/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 class SharedTranscriptionScreen extends StatefulWidget {
-  const SharedTranscriptionScreen({Key? key}) : super(key: key);
+  const SharedTranscriptionScreen({super.key});
+
   static String routeName = "/shared_transcription";
 
   @override
@@ -16,13 +15,21 @@ class SharedTranscriptionScreen extends StatefulWidget {
 }
 
 class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
+  late SharedScreenArguments args;
+  bool isLoading = false;
+
   //region Variables
   late StreamSubscription? _dataStreamSubscription;
-  late String _fileName = noFileSelectedText;
-  late SharedScreenArguments args;
 
+  late String _fileName = noFileSelectedText;
   String _text = 'Waiting for shared transcription...';
-  bool isLoading = false;
+
+  @override
+  void dispose() {
+    _dataStreamSubscription!.cancel();
+    super.dispose();
+  }
+
   //endregion
 
   //region Override Methods
@@ -31,11 +38,6 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _dataStreamSubscription!.cancel();
-    super.dispose();
-  }
   //endregion
 
   //region File Transcription
@@ -43,17 +45,17 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
     setState(() {
       isLoading = true;
     });
-    String filePath = args.sharedFiles.first.path;
+    final String filePath = args.sharedFiles.first.path;
 
     displayTranscription(filePath);
     displaySelectedFile(filePath.substring(filePath.lastIndexOf('/') + 1));
   }
 
   void displayTranscription(String path) async {
-    TranscriptionRequest transcriptionModel =
+    final TranscriptionRequest transcriptionModel =
         TranscriptionRequest(requestFilePath: path);
 
-    var result = await transcriptionModel.getTranscription(path);
+    final result = await transcriptionModel.getTranscription(path);
 
     setState(() {
       _text = result.text;
@@ -62,7 +64,7 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
     });
   }
 
-  void displaySelectedFile(fileName) {
+  void displaySelectedFile(String fileName) {
     setState(() {
       _fileName = fileName;
     });
@@ -72,7 +74,7 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    args = ModalRoute.of(context)!.settings.arguments as SharedScreenArguments;
+    args = ModalRoute.of(context)!.settings.arguments! as SharedScreenArguments;
     transcriptionFromSharedFile();
 
     return Scaffold(
@@ -84,12 +86,12 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
         children: <Widget>[
           Expanded(
             child: Container(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               color: Colors.grey[200],
               child: SingleChildScrollView(
                 child: Text(
                   _text,
-                  style: const TextStyle(fontSize: 20.0),
+                  style: const TextStyle(fontSize: 20),
                 ),
               ),
             ),
@@ -102,7 +104,7 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
           ),
           Container(
             height: 40,
-            margin: const EdgeInsets.all(16.0),
+            margin: const EdgeInsets.all(16),
             child: Align(
               alignment: Alignment.center,
               child: Text(
@@ -113,33 +115,6 @@ class _SharedTranscriptionScreenState extends State<SharedTranscriptionScreen> {
                 softWrap: true,
               ),
             ),
-            /*
-            ElevatedButton(
-                  onPressed: () {
-                    if (args.sharedFiles.first.path.isNotEmpty) {
-                      transcriptionFromSharedFile();
-                    } else {
-                      Fluttertoast.showToast(
-                        msg: noFileSelectedText,
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        textColor: Colors.white,
-                        fontSize: 16.0,
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(10.0),
-                    backgroundColor: args.sharedFiles.first.path.isEmpty
-                        ? Colors.grey
-                        : Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Icon(Icons.transcribe_rounded),
-                ),
-             */
           ),
         ],
       ),

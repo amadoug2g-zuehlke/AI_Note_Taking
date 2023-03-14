@@ -18,7 +18,7 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 //TODO: Add menu for shared file (Transcriptions or Translations)
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   static String routeName = "/";
 
@@ -45,11 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> files) {
-      if (files != null) {
-        setState(() {
-          _sharedFiles = files;
-        });
-      }
+      setState(() {
+        _sharedFiles = files;
+      });
     });
   }
 
@@ -62,15 +60,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //region Navigation
   void navigateToTranslate(BuildContext context) {
-    Navigator.pushNamed(context, TranslationScreen.routeName.toString());
+    Navigator.pushNamed(context, TranslationScreen.routeName);
   }
 
   void navigateToTranscription(BuildContext context) {
-    Navigator.pushNamed(context, TranscriptionScreen.routeName.toString());
+    Navigator.pushNamed(context, TranscriptionScreen.routeName);
   }
 
   void navigateToSharedTranscription(BuildContext context) {
-    if (_sharedFiles?.length != 0) {
+    if (_sharedFiles?.isNotEmpty ?? false) {
       Navigator.pushNamed(
         context,
         SharedTranscriptionScreen.routeName,
@@ -83,21 +81,21 @@ class _HomeScreenState extends State<HomeScreen> {
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 1,
         textColor: Colors.white,
-        fontSize: 16.0,
+        fontSize: 16,
       );
     }
   }
   //endregion
 
-  void showSupportedLanguages() {
-    Widget continueButton = TextButton(
+  Future<T?> showSupportedLanguages<T>() async {
+    final Widget continueButton = TextButton(
       child: const Text("OK"),
       onPressed: () {
         Navigator.of(context).pop();
       },
     );
 
-    AlertDialog alert = AlertDialog(
+    final AlertDialog alert = AlertDialog(
       title: const Text(supportedLanguagesTitle),
       content: const Text(
         supportedLanguagesList,
@@ -109,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
 
-    showDialog(
+    return await showDialog<T>(
       context: context,
       builder: (BuildContext context) {
         return alert;
@@ -124,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Text('Audio list to be implemented!'),
       ),
       floatingActionButton: ExpandableFab(
-        distance: 112.0,
+        distance: 112,
         children: [
           ActionButton(
             onPressed: () => navigateToSharedTranscription(context),
