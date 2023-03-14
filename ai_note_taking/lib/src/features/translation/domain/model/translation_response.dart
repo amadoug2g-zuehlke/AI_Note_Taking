@@ -1,10 +1,10 @@
 class TranslationResponse {
-  TranslationResponse();
+  TranslationResponse({required this.text});
 
   TranslationResponse.fromJson(Map<String, dynamic> json)
       : text = json['text'].toString();
 
-  late String text;
+  final String text;
 
   @override
   String toString() {

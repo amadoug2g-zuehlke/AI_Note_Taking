@@ -6,8 +6,8 @@ import 'package:ai_note_taking/utils/credentials.dart';
 class TranslationRequest {
   TranslationRequest({required this.requestFilePath});
 
-  final String requestFeature = 'audio/translations';
-  late final String requestFilePath;
+  static const String requestFeature = 'audio/translations';
+  final String requestFilePath;
   final Map<String, String> requestHeader = {
     'Authorization': 'Bearer $openAIBearerToken',
     'Content-Type': 'multipart/form-data',

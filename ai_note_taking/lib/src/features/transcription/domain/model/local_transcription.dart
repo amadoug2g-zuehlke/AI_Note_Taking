@@ -1,10 +1,15 @@
 import 'package:ai_note_taking/src/features/transcription/domain/model/transcript_type.dart';
 
 class LocalTranscriptionModel {
-  LocalTranscriptionModel();
+  LocalTranscriptionModel({
+    required this.transcriptionLanguage,
+    required this.transcriptionSourcePath,
+    required this.transcriptionText,
+    required this.type,
+  });
 
-  late String transcriptionLanguage;
-  late String transcriptionSourcePath;
-  late String transcriptionText;
-  late TranscriptType type;
+  final String transcriptionLanguage;
+  final String transcriptionSourcePath;
+  final String transcriptionText;
+  final TranscriptType type;
 }
